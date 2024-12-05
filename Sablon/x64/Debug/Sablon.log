@@ -1,9 +1,4 @@
-﻿  circle_renderer.cpp
-C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\circle_renderer.cpp(21,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\circle_renderer.cpp(59,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\circle_renderer.cpp(60,35): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  game.cpp
-C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\game.cpp(57,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\game.cpp(114,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-  Sablon.vcxproj -> C:\Users\lenovo-t450s\Documents\Grafika2024\Sablon\x64\Debug\Sablon.exe
+﻿  game.cpp
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(65,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(130,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  Sablon.vcxproj -> C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\x64\Debug\Sablon.exe

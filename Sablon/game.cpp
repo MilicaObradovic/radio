@@ -11,12 +11,16 @@
 // Game-related State data
 SpriteRenderer* Renderer;
 CircleRenderer* MembraneRenderer;
-SpriteRenderer* LightRenderer;
+CircleRenderer* LightRenderer;
 SpriteRenderer* ButtonRenderer;
+SpriteRenderer* AntennaRenderer;
 
 CircleRenderer* CRenderer;
 GameObject* Radio;
-GameObject* Light;
+GameObject* Antenna;
+GameObject* AntennaBase;
+
+RadioMembrane* Light;
 PowerButton* PowerOffButton;
 RadioMembrane* Membrane;
 RadioMembrane* Bass;
@@ -42,6 +46,9 @@ Game::~Game()
     delete PowerOffButton;
     delete ButtonRenderer;
     delete MembraneRenderer;
+    delete Antenna;
+    delete AntennaBase;
+    delete AntennaRenderer;
 }
 
 void Game::Init()
@@ -51,6 +58,7 @@ void Game::Init()
     ResourceManager::LoadShader("basic.vs", "basic.frag", nullptr, "basic");
     ResourceManager::LoadShader("basic.vs", "light.frag", nullptr, "light");
     ResourceManager::LoadShader("basic.vs", "membrane.frag", nullptr, "membrane");
+    ResourceManager::LoadShader("basic.vs", "antenna.frag", nullptr, "antenna");
 
 
     // configure shaders
@@ -66,18 +74,22 @@ void Game::Init()
     ResourceManager::GetShader("light").Use();
     ResourceManager::GetShader("light").SetMatrix4("projection", projection);
     ResourceManager::GetShader("light").SetFloat("time", timeValue);
+    ResourceManager::GetShader("antenna").Use();
+    ResourceManager::GetShader("antenna").SetMatrix4("projection", projection);
 
-    // set render-specific controls
     Shader shader = ResourceManager::GetShader("sprite");
     Shader basicShader = ResourceManager::GetShader("basic");
     Shader lightShader = ResourceManager::GetShader("light");
     Shader membraneShader = ResourceManager::GetShader("membrane");
+    Shader antennaShader = ResourceManager::GetShader("antenna");
 
     Renderer = new SpriteRenderer(shader);
-    LightRenderer = new SpriteRenderer(lightShader);
+    LightRenderer = new CircleRenderer(lightShader);
     CRenderer = new CircleRenderer(basicShader);
     ButtonRenderer = new SpriteRenderer(basicShader);
     MembraneRenderer = new CircleRenderer(membraneShader);
+    AntennaRenderer = new SpriteRenderer(antennaShader);
+
 
     // load textures
     ResourceManager::LoadTexture("wood3.jpg", true, "radio");
@@ -88,34 +100,38 @@ void Game::Init()
         ResourceManager::GetTexture("radio"));
     PowerOffButton = new PowerButton(glm::vec2(600.0f, 210.0f), glm::vec2(20.0f, 20.0f),
         ResourceManager::GetTexture("radio"));
-    Light = new GameObject(glm::vec2(220.0f, 220.0f), glm::vec2(6.0f, 12.0f),
+    Light = new RadioMembrane(glm::vec2(220.0f, 220.0f), 1, glm::vec2(6.0f, 12.0f),
         ResourceManager::GetTexture("radio"));
-    Bass = new RadioMembrane(glm::vec2(300.0f, 350.0f),6,  glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
-    Membrane = new RadioMembrane(glm::vec2(300.0f, 350.0f), 5, glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
-
+    Bass = new RadioMembrane(glm::vec2(300.0f, 350.0f),14,  glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
+    Membrane = new RadioMembrane(glm::vec2(300.0f, 350.0f), 12, glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
+    Antenna = new GameObject(glm::vec2(600.0f, 250.0f), glm::vec2(300.0f, 7.0f),
+        ResourceManager::GetTexture("radio"));
+    AntennaBase = new GameObject(glm::vec2(600.0f, 255.0f), glm::vec2(130.0f, 17.0f),
+        ResourceManager::GetTexture("radio"));
 }
 
-void Game::Update(float dt)
-{
- 
+void Game::Update(float dt){}
 
-
-}
-
-void Game::ProcessInput(float dt)
-{
-
-}
+void Game::ProcessInput(float dt){}
 
 void Game::Render(GLFWwindow* window)
 {
-    Radio->Draw(*Renderer);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        Antenna->Size = glm::vec2(160.0f, 7.0f);
+    }else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        Antenna->Size = glm::vec2(300.0f, 7.0f);
+    }
+    Antenna->Draw(*AntennaRenderer, true);
+    AntennaBase->Draw(*AntennaRenderer, true);
+
+    Radio->Draw(*Renderer, false);
     ResourceManager::GetShader("light").Use();
     ResourceManager::GetShader("light").SetFloat("time", glfwGetTime());
     ResourceManager::GetShader("light").SetBool("isOn", PowerOffButton->MusicPlaying);
-
+    Light->MusicPlaying = false;
     Light->Draw(*LightRenderer);
-    PowerOffButton->Draw(*ButtonRenderer);
+    PowerOffButton->Draw(*ButtonRenderer, false);
     glfwSetWindowUserPointer(window, PowerOffButton);
     ResourceManager::GetShader("basic").Use();
     ResourceManager::GetShader("basic").SetVector3f("uColor", PowerOffButton->Color);
@@ -124,8 +140,10 @@ void Game::Render(GLFWwindow* window)
         PowerButton* powerOffButton = static_cast<PowerButton*>(glfwGetWindowUserPointer(window));
         powerOffButton->mouse_callback(window, button, action, mods);
         });
+
     Membrane->MusicPlaying = PowerOffButton->MusicPlaying;
     Bass->MusicPlaying = false;
     Bass->Draw(*CRenderer);
     Membrane->Draw(*MembraneRenderer);
+
 }

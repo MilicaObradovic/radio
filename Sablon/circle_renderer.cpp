@@ -48,7 +48,7 @@ void CircleRenderer::initRenderData()
     // configure VAO/VBO
     unsigned int VBO;
     float circle[(CRES + 2) * 2];
-    float r = 10; //poluprecnik
+    float r = 5; //poluprecnik
 
     circle[0] = 0; //Centar X0
     circle[1] = 0; //Centar Y0
