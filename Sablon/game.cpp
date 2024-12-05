@@ -6,6 +6,7 @@
 #include "radio_membrane.h"
 #include "circle_renderer.h"
 #include "power_off_button.h"
+#include <iostream>
 
 
 // Game-related State data
@@ -138,7 +139,7 @@ void Game::Init()
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
     ProgressBar = new GameObject(glm::vec2(360.0f, 230.0f), glm::vec2(130.0f, 40.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
-    Pointer = new GameObject(glm::vec2(450.0f, 400.0f), glm::vec2(30.0f, 3.0f),
+    Pointer = new GameObject(glm::vec2(435.0f, 400.0f), glm::vec2(30.0f, 3.0f),
         ResourceManager::GetTexture("radio"), glm::vec3(0.7, 0.1, 0.1));
     Slider = new GameObject(glm::vec2(370.0f, 470.0f), glm::vec2(225.0f, 15.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -151,6 +152,88 @@ void Game::Init()
 void Game::Update(float dt){}
 
 void Game::ProcessInput(float dt){}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    std::cout << "Scroll Offset - X: " << xoffset << ", Y: " << yoffset << std::endl;
+
+    // For example, zoom in/out based on the yoffset (vertical scroll direction)
+    if (yoffset > 0) {
+        std::cout << "Zooming In" << std::endl;
+        Pointer->Position.x += 3;
+        if (Pointer->Position.x > 690.0f) {
+            Pointer->Position.x = 690.0f;
+        }
+    }else if (yoffset < 0) {
+        std::cout << "Zooming Out" << std::endl;
+        Pointer->Position.x -= 3;
+        if (Pointer->Position.x < 435.0f) {
+            Pointer->Position.x = 435.0f;
+        }
+    }
+}
+
+bool isDragging = false;
+float mouseOffset = 0;
+// Mouse position callback
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (isDragging) {
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        if (xpos < SliderPointer->Position.x ) {
+            SliderPointer->Position.x -= 3;
+        }else if (xpos > SliderPointer->Position.x) {
+            SliderPointer->Position.x += 3;
+        }
+
+        if (SliderPointer->Position.x < 380) {
+            SliderPointer->Position.x = 380;
+        }
+        else if(SliderPointer->Position.x > 675) {
+            SliderPointer->Position.x = 675;
+        }
+    }
+}
+
+// Mouse button callback
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            double xpos, ypos;
+            glfwGetCursorPos(window, &xpos, &ypos);
+            glm::vec2 mousePos(xpos, ypos);
+            int width, height;
+            glfwGetWindowSize(window, &width, &height);
+
+            if (xpos >= SliderPointer->Position.x && xpos <= SliderPointer->Position.x + 1.5 * SliderPointer->Size.x &&
+                ypos >= SliderPointer->Position.y && ypos <= SliderPointer->Position.y + SliderPointer->Size.y) {
+                std::cout << "Click" << std::endl;
+
+                isDragging = true;
+                mouseOffset = xpos - SliderPointer->Position.x;
+            }
+            if (xpos >= PowerOffButton->Position.x && xpos <= PowerOffButton->Position.x + 1.5 * PowerOffButton->Size.x &&
+                ypos >= PowerOffButton->Position.y && ypos <= PowerOffButton->Position.y + PowerOffButton->Size.y) {
+                std::cout << "Power" << std::endl;
+
+                PowerOffButton->MusicPlaying = !PowerOffButton->MusicPlaying;
+
+                if (!PowerOffButton->MusicPlaying) {
+                    PowerOffButton->Color = glm::vec3(0.7, 0.1, 0.1);
+                }
+                else {
+                    PowerOffButton->Color = glm::vec3(0.0f);
+                }
+            }
+        }
+        else if (action == GLFW_RELEASE) {
+            isDragging = false;
+        }
+    }
+}
 
 void Game::Render(GLFWwindow* window)
 {
@@ -182,10 +265,11 @@ void Game::Render(GLFWwindow* window)
     ResourceManager::GetShader("basic").Use();
     ResourceManager::GetShader("basic").SetVector3f("uColor", PowerOffButton->Color);
 
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
+    /*glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
         PowerButton* powerOffButton = static_cast<PowerButton*>(glfwGetWindowUserPointer(window));
         powerOffButton->mouse_callback(window, button, action, mods);
-        });
+        });*/
+    glfwSetScrollCallback(window, scroll_callback);
 
     Membrane->MusicPlaying = PowerOffButton->MusicPlaying;
     Bass->MusicPlaying = false;
@@ -201,5 +285,9 @@ void Game::Render(GLFWwindow* window)
     FM->Draw(*CRenderer);
     SliderPointer->Draw(*ButtonRenderer, false, false);
     ProgressBar->Draw(*ButtonRenderer, false, false);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+
 
 }
+
