@@ -6,7 +6,7 @@ PowerButton::PowerButton()
 }
 
 PowerButton::PowerButton(glm::vec2 pos, glm::vec2 size, Texture2D sprite)
-    :MusicPlaying(false), GameObject(pos, size, sprite, glm::vec3(1.0f, 1.0f, 1.0f))
+    :MusicPlaying(false), GameObject(pos, size, sprite, glm::vec3(0.7, 0.1, 0.1))
 {
 }
 
@@ -33,7 +33,7 @@ void PowerButton::mouse_callback(GLFWwindow* window, int button, int action, int
             this->MusicPlaying = !this->MusicPlaying;
 
             if (!this->MusicPlaying) {
-                this->Color = glm::vec3(1.0f);
+                this->Color = glm::vec3(0.7, 0.1, 0.1);
             }
             else {
                 this->Color = glm::vec3(0.0f);

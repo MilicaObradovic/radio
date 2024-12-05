@@ -13,7 +13,7 @@ SpriteRenderer::~SpriteRenderer()
     glDeleteVertexArrays(1, &this->quadVAO);
 }
 
-void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color, bool isAntenna)
+void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color, bool isAntenna, bool isPointer)
 {
     // prepare transformations
     this->shader.Use();
@@ -21,9 +21,10 @@ void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec
     model = glm::translate(model, glm::vec3(position, 0.0f)); 
 
     if (isAntenna) {
-        //model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f)); // move origin of rotation to center of quad
         model = glm::rotate(model, glm::radians(-155.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // then rotate
-        //model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f)); // move origin back
+    }
+    else if (isPointer) {
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // then rotate
 
     }
     

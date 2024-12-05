@@ -1,4 +1,2 @@
-﻿  game.cpp
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(65,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(130,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+﻿  power_off_button.cpp
   Sablon.vcxproj -> C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\x64\Debug\Sablon.exe
