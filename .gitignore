@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+.vs/
+*.vcxproj*
+*.pdb
+*.sdf
+*.user
+*.opensdf
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
