@@ -6,7 +6,7 @@ RadioMembrane::RadioMembrane()
     : GameObject(), Radius(12.5f), MusicPlaying(true) { }
 
 RadioMembrane::RadioMembrane(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite)
-    : GameObject(pos, glm::vec2(radius * 2.0f, radius * 2.0f), sprite, glm::vec3(1.0f, 0.0f, 0.0f), velocity), Radius(radius), MusicPlaying(true) { }
+    : GameObject(pos, glm::vec2(radius * 2.0f, radius * 2.0f), sprite, glm::vec3(0.0f, 0.0f, 0.0f), velocity), Radius(radius), MusicPlaying(true) { }
 
 glm::vec2 RadioMembrane::Move(float dt, unsigned int window_width)
 {
@@ -20,7 +20,7 @@ glm::vec2 RadioMembrane::Move(float dt, unsigned int window_width)
 
 void RadioMembrane::Draw(CircleRenderer& renderer)
 {
-    renderer.DrawCircle(this->Sprite, this->Position, this->Radius,  glm::vec3(0.0f, 0.0f, 0.0f), this->MusicPlaying);
+    renderer.DrawCircle(this->Sprite, this->Position, this->Radius,  this->Color , this->MusicPlaying);
 
 }
 
