@@ -47,6 +47,7 @@ bool isDragging = false;
 float mouseOffset = 0;
 bool isAntennaOn = true;
 bool isAM = true;
+
 RadioStation stations[] = {
         RadioStation("TDI radio", 440, AM),   
         RadioStation("Lola radio", 490, AM),   
@@ -339,22 +340,18 @@ void Game::Render(GLFWwindow* window)
         TextSmaller->RenderText("ON", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(669.0f, 207.0f));
 
     Text->RenderMovingText(radioStationX, 640.0f, 410.0f, 1);
-
+    Membrane->MusicPlaying = false;
     if (isAntennaOn && PowerOffButton->MusicPlaying) {
         for (int i = 0; i <= 5; i++)
         {
             if (std::abs(Pointer->Position.x - stations[i].Frequency) < 4) {
+                
                 if (isAM && stations[i].StationType == AM) {
                     Text->RenderText(stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
                     Membrane->MusicPlaying = true;
-                }
-                else if (!isAM && stations[i].StationType == FM){
+                }else if (!isAM && stations[i].StationType == FM){
                     Text->RenderText(stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
                     Membrane->MusicPlaying = true;
-
-                }
-                else {
-                    Membrane->MusicPlaying = false;
 
                 }
             }
