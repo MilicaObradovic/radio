@@ -14,7 +14,7 @@ CircleRenderer::~CircleRenderer()
     glDeleteVertexArrays(1, &this->quadVAO);
 }
 
-void CircleRenderer::DrawCircle(Texture2D& texture, glm::vec2 position, float radius, glm::vec3 color, bool isMusicPlaying)
+void CircleRenderer::DrawCircle(Texture2D& texture, glm::vec2 position, float radius, glm::vec3 color, bool isMusicPlaying, float velocity)
 {
     // prepare transformations
     this->shader.Use();
@@ -26,7 +26,7 @@ void CircleRenderer::DrawCircle(Texture2D& texture, glm::vec2 position, float ra
 
 
     if (isMusicPlaying) {
-        float vibrationFactor = sin(time * 20.0f) * 0.05f + 1.0f;
+        float vibrationFactor = sin(time * (20.0f)) * (velocity) + 1.0f;
         model = glm::scale(model, glm::vec3(vibrationFactor, vibrationFactor, 1.0f));
     }
 

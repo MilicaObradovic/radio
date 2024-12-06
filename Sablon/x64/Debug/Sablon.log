@@ -1,5 +1,8 @@
 ﻿  game.cpp
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(84,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(216,36): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(259,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(86,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(191,40): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(195,40): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(207,38): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(229,36): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(272,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   Sablon.vcxproj -> C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\x64\Debug\Sablon.exe

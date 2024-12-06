@@ -19,7 +19,7 @@ public:
     // Destructor
     ~CircleRenderer();
     // Renders a defined quad textured with given sprite
-    void DrawCircle(Texture2D& texture, glm::vec2 position, float radius = 10.0f, glm::vec3 color = glm::vec3(1.0f), bool isMusicPlaying=false);
+    void DrawCircle(Texture2D& texture, glm::vec2 position, float radius = 10.0f, glm::vec3 color = glm::vec3(1.0f), bool isMusicPlaying=false, float velocity = 0);
 private:
     // Render state
     Shader       shader;

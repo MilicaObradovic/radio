@@ -26,6 +26,7 @@ GameObject* Pointer;
 GameObject* Slider;
 GameObject* SliderPointer;
 GameObject* ProgressBar;
+GameObject* VolumeBar;
 
 
 RadioMembrane* Light;
@@ -68,6 +69,7 @@ Game::~Game()
     delete FM;
     delete SliderPointer;
     delete ProgressBar;
+    delete VolumeBar;
 }
 
 void Game::Init()
@@ -120,14 +122,11 @@ void Game::Init()
         ResourceManager::GetTexture("radio"));
     PowerOffButton = new PowerButton(glm::vec2(670.0f, 210.0f), glm::vec2(20.0f, 20.0f),
         ResourceManager::GetTexture("radio"));
-    Light = new RadioMembrane(glm::vec2(220.0f, 220.0f), 1, glm::vec2(6.0f, 12.0f),
-        ResourceManager::GetTexture("radio"));
-    AM = new RadioMembrane(glm::vec2(650.0f, 440.0f), 2, glm::vec2(6.0f, 12.0f),
-        ResourceManager::GetTexture("radio"));
-    FM = new RadioMembrane(glm::vec2(680.0f, 440.0f), 2, glm::vec2(6.0f, 12.0f),
-        ResourceManager::GetTexture("radio"));
-    Bass = new RadioMembrane(glm::vec2(310.0f, 360.0f),16,  glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
-    Membrane = new RadioMembrane(glm::vec2(310.0f, 360.0f), 14, glm::vec2(300.0f, 400.0f), ResourceManager::GetTexture("face"));
+    Light = new RadioMembrane(glm::vec2(220.0f, 220.0f), 1, ResourceManager::GetTexture("radio"));
+    AM = new RadioMembrane(glm::vec2(650.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
+    FM = new RadioMembrane(glm::vec2(680.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
+    Bass = new RadioMembrane(glm::vec2(310.0f, 360.0f),16, ResourceManager::GetTexture("face"));
+    Membrane = new RadioMembrane(glm::vec2(310.0f, 360.0f), 14, ResourceManager::GetTexture("face"));
     Antenna = new GameObject(glm::vec2(650.0f, 250.0f), glm::vec2(300.0f, 7.0f),
         ResourceManager::GetTexture("radio"));
     AntennaBase = new GameObject(glm::vec2(650.0f, 255.0f), glm::vec2(130.0f, 17.0f),
@@ -137,14 +136,18 @@ void Game::Init()
         ResourceManager::GetTexture("amfmscale"));
     Display = new GameObject(glm::vec2(410.0f, 300.0f), glm::vec2(200.0f, 40.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
-    ProgressBar = new GameObject(glm::vec2(360.0f, 230.0f), glm::vec2(130.0f, 40.0f),
+    ProgressBar = new GameObject(glm::vec2(360.0f, 230.0f), glm::vec2(120.0f, 40.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
     Pointer = new GameObject(glm::vec2(435.0f, 400.0f), glm::vec2(30.0f, 3.0f),
         ResourceManager::GetTexture("radio"), glm::vec3(0.7, 0.1, 0.1));
-    Slider = new GameObject(glm::vec2(370.0f, 470.0f), glm::vec2(225.0f, 15.0f),
+    Slider = new GameObject(glm::vec2(360.0f, 470.0f), glm::vec2(195.0f, 15.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.0f, 0.0f, 0.0f));
-    SliderPointer = new GameObject(glm::vec2(380.0f, 467.0f), glm::vec2(15.0f, 21.0f),
+    SliderPointer = new GameObject(glm::vec2(370.0f, 467.0f), glm::vec2(15.0f, 21.0f),
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.7, 0.1, 0.1));
+    VolumeBar = new GameObject(glm::vec2(375.0f, 237.0f), glm::vec2(0.0f, 20.0f),
+        ResourceManager::GetTexture("amfmscale"), glm::vec3(0.643, 0.529, 0.475));
+
+
     AM->Color = glm::vec3(0.7, 0.1, 0.1);
 
 }
@@ -183,16 +186,26 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
         glfwGetWindowSize(window, &width, &height);
 
         if (xpos < SliderPointer->Position.x ) {
-            SliderPointer->Position.x -= 3;
+            SliderPointer->Position.x -= 5;
+            VolumeBar->Size.x -= 2;
+            Membrane->Velocity -= 0.001;
         }else if (xpos > SliderPointer->Position.x) {
-            SliderPointer->Position.x += 3;
+            SliderPointer->Position.x += 5;
+            VolumeBar->Size.x += 2;
+            Membrane->Velocity += 0.001;
         }
 
-        if (SliderPointer->Position.x < 380) {
-            SliderPointer->Position.x = 380;
+        if (SliderPointer->Position.x < 370) {
+            SliderPointer->Position.x = 370;
+            VolumeBar->Size.x = 0;
+            Membrane->Velocity = 0;
+
         }
-        else if(SliderPointer->Position.x > 675) {
-            SliderPointer->Position.x = 675;
+        else if(SliderPointer->Position.x > 620) {
+            SliderPointer->Position.x = 620;
+            VolumeBar->Size.x = 100;
+            Membrane->Velocity = 0.05;
+
         }
     }
 }
@@ -287,6 +300,7 @@ void Game::Render(GLFWwindow* window)
     ProgressBar->Draw(*ButtonRenderer, false, false);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
+    VolumeBar->Draw(*ButtonRenderer, false, false);
 
 
 }

@@ -18,9 +18,8 @@ public:
     bool    MusicPlaying;
     // constructor(s)
     RadioMembrane();
-    RadioMembrane(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite);
+    RadioMembrane(glm::vec2 pos, float radius, Texture2D sprite , float velocity = 0);
     glm::vec2 Move(float dt, unsigned int window_width);
-    void      Reset(glm::vec2 position, glm::vec2 velocity);
     virtual void Draw(CircleRenderer& renderer);
 
 };
