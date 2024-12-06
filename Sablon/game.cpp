@@ -9,6 +9,7 @@
 #include <iostream>
 #include "text_renderer.h"
 #include <string> 
+#include <cmath> 
 #include "radio_station.h"
 
 // Game-related State data
@@ -45,11 +46,11 @@ bool isDragging = false;
 float mouseOffset = 0;
 bool isAntennaOn = true;
 RadioStation stations[] = {
-        RadioStation("TDI radio", 1, AM),   
-        RadioStation("Lola radio", 2, AM),   
-        RadioStation("ASFM radio", 3, FM),
-        RadioStation("Radio S", 4, FM),
-        RadioStation("Radio S2", 5, FM),
+        RadioStation("TDI radio", 440, AM),   
+        RadioStation("Lola radio", 490, AM),   
+        RadioStation("ASFM radio", 540, FM),
+        RadioStation("Radio S", 590, FM),
+        RadioStation("Radio S2", 630, FM),
 };
 
 Game::Game(unsigned int width, unsigned int height)
@@ -322,10 +323,16 @@ void Game::Render(GLFWwindow* window)
 
     Text->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
 
-    Text->RenderMovingText(radioStationX, 640.0f, 410.0f,0.1);
+    Text->RenderMovingText(radioStationX, 640.0f, 410.0f, 1);
 
-
-    Text->RenderText("TDI radio", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+    if (isAntennaOn && PowerOffButton->MusicPlaying) {
+        for (int i = 0; i <= 5; i++)
+        {
+            if (std::abs(Pointer->Position.x - stations[i].Frequency) < 4) {
+                Text->RenderText( stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+            }
+        }
+    }
 
 
     /*std::string text = "TDI radio - dobro jutro";

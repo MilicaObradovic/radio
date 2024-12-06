@@ -4,7 +4,8 @@
 
 #include "game.h"
 #include "resource_manager.h"
-
+#include <chrono>
+#include <thread>
 #include <iostream>
 
 // GLFW function declarations
@@ -66,8 +67,11 @@ int main(int argc, char* argv[])
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
 
+    float currentTime = glfwGetTime();
+
     while (!glfwWindowShouldClose(window))
     {
+        float startTime = glfwGetTime();
         // calculate delta time
         // --------------------
         float currentFrame = glfwGetTime();
@@ -90,6 +94,11 @@ int main(int argc, char* argv[])
         Breakout.Render(window);
 
         glfwSwapBuffers(window);
+        float endTime = glfwGetTime();
+        float trt = (startTime - endTime)*1000;
+        if (trt < 1000 / 60) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60 - int(trt)));
+        }
     }
 
     // delete all resources as loaded using the resource manager

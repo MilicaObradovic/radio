@@ -1,14 +1,10 @@
 ﻿  game.cpp
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(105,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(208,40): warning C4305: '-=': truncation from 'double' to 'float'
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(212,40): warning C4305: '+=': truncation from 'double' to 'float'
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(224,38): warning C4305: '=': truncation from 'double' to 'float'
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(246,36): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(291,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(325,61): warning C4305: 'argument': truncation from 'double' to 'float'
-  radio_membrane.cpp
-  radio_station.cpp
-  Generating Code...
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(106,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(209,40): warning C4305: '-=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(213,40): warning C4305: '+=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(225,38): warning C4305: '=': truncation from 'double' to 'float'
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(247,36): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\lenovo-t450s\Documents\Grafika2024\radio\Sablon\game.cpp(292,69): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 freetype26d.lib(ftinit.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(ftinit.obj)' or at ''; linking object as if no debug info
 freetype26d.lib(ftbase.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(ftbase.obj)' or at ''; linking object as if no debug info
 freetype26d.lib(autofit.obj) : warning LNK4099: PDB '' was not found with 'freetype26d.lib(autofit.obj)' or at ''; linking object as if no debug info
