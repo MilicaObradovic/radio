@@ -12,13 +12,14 @@
 #include <cmath> 
 #include "radio_station.h"
 
-// Game-related State data
 SpriteRenderer* Renderer;
 CircleRenderer* MembraneRenderer;
 CircleRenderer* LightRenderer;
 SpriteRenderer* ButtonRenderer;
 SpriteRenderer* AntennaRenderer;
 TextRenderer* Text;
+TextRenderer* TextSmaller;
+TextRenderer* TextBig;
 
 CircleRenderer* CRenderer;
 GameObject* Radio;
@@ -45,6 +46,7 @@ float radioStationX = 610;
 bool isDragging = false;
 float mouseOffset = 0;
 bool isAntennaOn = true;
+bool isAM = true;
 RadioStation stations[] = {
         RadioStation("TDI radio", 440, AM),   
         RadioStation("Lola radio", 490, AM),   
@@ -86,6 +88,8 @@ Game::~Game()
     delete ProgressBar;
     delete VolumeBar;
     delete Text;
+    delete TextSmaller;
+    delete TextBig;
 }
 
 void Game::Init()
@@ -93,6 +97,10 @@ void Game::Init()
 
     Text = new TextRenderer(Width, Height);
     Text->Load("LiberationSans-Regular.ttf", 16);
+    TextSmaller = new TextRenderer(Width, Height);
+    TextSmaller->Load("LiberationSans-Regular.ttf", 12);
+    TextBig = new TextRenderer(Width, Height);
+    TextBig->Load("LiberationSans-Regular.ttf", 22);
 
     // load shaders
     ResourceManager::LoadShader("sprite.vs", "sprite.frag", nullptr, "sprite");
@@ -179,8 +187,6 @@ void Game::ProcessInput(float dt){}
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     std::cout << "Scroll Offset - X: " << xoffset << ", Y: " << yoffset << std::endl;
-
-    // For example, zoom in/out based on the yoffset (vertical scroll direction)
     if (yoffset > 0) {
         std::cout << "Zooming In" << std::endl;
         Pointer->Position.x += 3;
@@ -196,7 +202,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     }
 }
 
-// Mouse position callback
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if (isDragging) {
@@ -278,11 +283,12 @@ void Game::Render(GLFWwindow* window)
     }else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         AMbutton->Color = glm::vec3(0.7, 0.1, 0.1);
         FMbutton->Color = glm::vec3(0.0, 0.0, 0.0);
+        isAM = true;
 
     }else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         FMbutton->Color = glm::vec3(0.7, 0.1, 0.1);
         AMbutton->Color = glm::vec3(0.0, 0.0, 0.0);
-
+        isAM = false;
     }
     Antenna->Draw(*AntennaRenderer, true, false);
     AntennaBase->Draw(*AntennaRenderer, true, false);
@@ -299,12 +305,12 @@ void Game::Render(GLFWwindow* window)
     ResourceManager::GetShader("basic").SetVector3f("uColor", PowerOffButton->Color);
 
     glfwSetScrollCallback(window, scroll_callback);
-
-    Membrane->MusicPlaying = PowerOffButton->MusicPlaying;
     
     Bass->MusicPlaying = false;
     Bass->Draw(*CRenderer);
     if (!isAntennaOn)
+        Membrane->MusicPlaying = false;
+    if (!PowerOffButton->MusicPlaying)
         Membrane->MusicPlaying = false;
     Membrane->Draw(*MembraneRenderer);
     AMFMbar->Draw(*Renderer, false, false);
@@ -319,9 +325,18 @@ void Game::Render(GLFWwindow* window)
     ProgressBar->Draw(*ButtonRenderer, false, false);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    VolumeBar->Draw(*ButtonRenderer, false, false);
-
+    VolumeBar->Draw(*ButtonRenderer, false, false); 
+    
     Text->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
+    TextBig->RenderText("-", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475), glm::vec2(360.0f, 481.0f));
+    TextBig->RenderText("+", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475), glm::vec2(635.0f, 482.0f));
+
+    TextSmaller->RenderText("AM", 5.0f, 5.0f, 1.0f, glm::vec3(1,1,1), glm::vec2(637.0f, 430.0f));
+    TextSmaller->RenderText("FM", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(667.0f, 430.0f));
+    if(PowerOffButton->MusicPlaying)
+         TextSmaller->RenderText("OFF", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(668.0f, 207.0f));
+    else
+        TextSmaller->RenderText("ON", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(669.0f, 207.0f));
 
     Text->RenderMovingText(radioStationX, 640.0f, 410.0f, 1);
 
@@ -329,7 +344,19 @@ void Game::Render(GLFWwindow* window)
         for (int i = 0; i <= 5; i++)
         {
             if (std::abs(Pointer->Position.x - stations[i].Frequency) < 4) {
-                Text->RenderText( stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+                if (isAM && stations[i].StationType == AM) {
+                    Text->RenderText(stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+                    Membrane->MusicPlaying = true;
+                }
+                else if (!isAM && stations[i].StationType == FM){
+                    Text->RenderText(stations[i].Name, 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+                    Membrane->MusicPlaying = true;
+
+                }
+                else {
+                    Membrane->MusicPlaying = false;
+
+                }
             }
         }
     }
