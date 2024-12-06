@@ -9,7 +9,6 @@
 #include "game_object.h"
 #include "texture.h"
 
-
 class RadioMembrane : public GameObject
 {
 public:

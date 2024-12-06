@@ -1,4 +1,4 @@
-
+﻿
 #include "game.h"
 #include "resource_manager.h"
 #include "sprite_renderer.h"
@@ -7,7 +7,9 @@
 #include "circle_renderer.h"
 #include "power_off_button.h"
 #include <iostream>
-
+#include "text_renderer.h"
+#include <string> 
+#include "radio_station.h"
 
 // Game-related State data
 SpriteRenderer* Renderer;
@@ -15,6 +17,7 @@ CircleRenderer* MembraneRenderer;
 CircleRenderer* LightRenderer;
 SpriteRenderer* ButtonRenderer;
 SpriteRenderer* AntennaRenderer;
+TextRenderer* Text;
 
 CircleRenderer* CRenderer;
 GameObject* Radio;
@@ -30,13 +33,24 @@ GameObject* VolumeBar;
 
 
 RadioMembrane* Light;
-RadioMembrane* AM;
-RadioMembrane* FM;
+RadioMembrane* AMbutton;
+RadioMembrane* FMbutton;
 
 PowerButton* PowerOffButton;
 RadioMembrane* Membrane;
 RadioMembrane* Bass;
+float radioStationX = 610;
 
+bool isDragging = false;
+float mouseOffset = 0;
+bool isAntennaOn = true;
+RadioStation stations[] = {
+        RadioStation("TDI radio", 1, AM),   
+        RadioStation("Lola radio", 2, AM),   
+        RadioStation("ASFM radio", 3, FM),
+        RadioStation("Radio S", 4, FM),
+        RadioStation("Radio S2", 5, FM),
+};
 
 Game::Game(unsigned int width, unsigned int height)
     : Keys(), Width(width), Height(height)
@@ -65,15 +79,20 @@ Game::~Game()
     delete Display;
     delete Pointer;
     delete Slider;
-    delete AM;
-    delete FM;
+    delete AMbutton;
+    delete FMbutton;
     delete SliderPointer;
     delete ProgressBar;
     delete VolumeBar;
+    delete Text;
 }
 
 void Game::Init()
 {
+
+    Text = new TextRenderer(Width, Height);
+    Text->Load("LiberationSans-Regular.ttf", 16);
+
     // load shaders
     ResourceManager::LoadShader("sprite.vs", "sprite.frag", nullptr, "sprite");
     ResourceManager::LoadShader("basic.vs", "basic.frag", nullptr, "basic");
@@ -123,8 +142,8 @@ void Game::Init()
     PowerOffButton = new PowerButton(glm::vec2(670.0f, 210.0f), glm::vec2(20.0f, 20.0f),
         ResourceManager::GetTexture("radio"));
     Light = new RadioMembrane(glm::vec2(220.0f, 220.0f), 1, ResourceManager::GetTexture("radio"));
-    AM = new RadioMembrane(glm::vec2(650.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
-    FM = new RadioMembrane(glm::vec2(680.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
+    AMbutton = new RadioMembrane(glm::vec2(650.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
+    FMbutton = new RadioMembrane(glm::vec2(680.0f, 440.0f), 2, ResourceManager::GetTexture("radio"));
     Bass = new RadioMembrane(glm::vec2(310.0f, 360.0f),16, ResourceManager::GetTexture("face"));
     Membrane = new RadioMembrane(glm::vec2(310.0f, 360.0f), 14, ResourceManager::GetTexture("face"));
     Antenna = new GameObject(glm::vec2(650.0f, 250.0f), glm::vec2(300.0f, 7.0f),
@@ -148,7 +167,7 @@ void Game::Init()
         ResourceManager::GetTexture("amfmscale"), glm::vec3(0.643, 0.529, 0.475));
 
 
-    AM->Color = glm::vec3(0.7, 0.1, 0.1);
+    AMbutton->Color = glm::vec3(0.7, 0.1, 0.1);
 
 }
 
@@ -176,8 +195,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     }
 }
 
-bool isDragging = false;
-float mouseOffset = 0;
 // Mouse position callback
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -253,15 +270,17 @@ void Game::Render(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         Antenna->Size = glm::vec2(160.0f, 7.0f);
+        isAntennaOn = false;
     }else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         Antenna->Size = glm::vec2(300.0f, 7.0f);
+        isAntennaOn = true;
     }else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        AM->Color = glm::vec3(0.7, 0.1, 0.1);
-        FM->Color = glm::vec3(0.0, 0.0, 0.0);
+        AMbutton->Color = glm::vec3(0.7, 0.1, 0.1);
+        FMbutton->Color = glm::vec3(0.0, 0.0, 0.0);
 
     }else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
-        FM->Color = glm::vec3(0.7, 0.1, 0.1);
-        AM->Color = glm::vec3(0.0, 0.0, 0.0);
+        FMbutton->Color = glm::vec3(0.7, 0.1, 0.1);
+        AMbutton->Color = glm::vec3(0.0, 0.0, 0.0);
 
     }
     Antenna->Draw(*AntennaRenderer, true, false);
@@ -278,30 +297,47 @@ void Game::Render(GLFWwindow* window)
     ResourceManager::GetShader("basic").Use();
     ResourceManager::GetShader("basic").SetVector3f("uColor", PowerOffButton->Color);
 
-    /*glfwSetMouseButtonCallback(window, [](GLFWwindow* window, int button, int action, int mods) {
-        PowerButton* powerOffButton = static_cast<PowerButton*>(glfwGetWindowUserPointer(window));
-        powerOffButton->mouse_callback(window, button, action, mods);
-        });*/
     glfwSetScrollCallback(window, scroll_callback);
 
     Membrane->MusicPlaying = PowerOffButton->MusicPlaying;
+    
     Bass->MusicPlaying = false;
     Bass->Draw(*CRenderer);
+    if (!isAntennaOn)
+        Membrane->MusicPlaying = false;
     Membrane->Draw(*MembraneRenderer);
     AMFMbar->Draw(*Renderer, false, false);
     Display->Draw(*ButtonRenderer, false, false);
     Pointer->Draw(*ButtonRenderer, false, true);
     Slider->Draw(*ButtonRenderer, false, false);
-    AM->MusicPlaying = false;
-    AM->Draw(*CRenderer);
-    FM->MusicPlaying = false;
-    FM->Draw(*CRenderer);
+    AMbutton->MusicPlaying = false;
+    AMbutton->Draw(*CRenderer);
+    FMbutton->MusicPlaying = false;
+    FMbutton->Draw(*CRenderer);
     SliderPointer->Draw(*ButtonRenderer, false, false);
     ProgressBar->Draw(*ButtonRenderer, false, false);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     VolumeBar->Draw(*ButtonRenderer, false, false);
 
+    Text->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
 
+    Text->RenderMovingText(radioStationX, 640.0f, 410.0f,0.1);
+
+
+    Text->RenderText("TDI radio", 5.0f, 5.0f, 1.0f, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+
+
+    /*std::string text = "TDI radio - dobro jutro";
+    float x = 5;
+    float scale = 1;
+    for (size_t i = 0; i < text.length(); ++i) {
+
+        Character ch = Text->Characters[text[i]];
+        Text->RenderChar(ch, x, 5.0f, scale, glm::vec3(1, 1, 1), glm::vec2(radioStationX, 304.0f));
+        x += (ch.Advance >> 6) * scale;
+    }*/
+
+    // Render the moving text
 }
 
