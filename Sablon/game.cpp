@@ -328,7 +328,7 @@ void Game::Render(GLFWwindow* window)
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     VolumeBar->Draw(*ButtonRenderer, false, false); 
     
-    Text->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
+    TextBig->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
     TextBig->RenderText("-", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475), glm::vec2(360.0f, 481.0f));
     TextBig->RenderText("+", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475), glm::vec2(635.0f, 482.0f));
 
