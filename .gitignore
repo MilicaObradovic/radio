@@ -41,4 +41,5 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 *.cmake
-x64/
+Sablon/x64/
+Sablon/packages
