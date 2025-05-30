@@ -147,7 +147,8 @@ int main()
             camera.ResetCameraPosition();
 
         }
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 view = camera.GetViewRadiusCamera();
+
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
@@ -249,7 +250,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         orthogonal = !orthogonal;
         std::cout << (orthogonal ? "Switched to Perspective" : "Switched to Orthographic") << std::endl;
     } 
-    if (key >= 0 && key < 1024)
+    if (key >= 0 && key < 1024) 
     {
         
     }
