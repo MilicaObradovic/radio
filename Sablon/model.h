@@ -33,18 +33,38 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
+    float speed;
+    glm::vec3 position;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, bool gamma = false) : gammaCorrection(gamma)
+    Model(glm::vec3 pos, string const& path, bool gamma = false) : gammaCorrection(gamma)
     {
+        position = pos;
+        speed = 0.1f + static_cast<float>(rand()) / RAND_MAX * 0.5f;
         loadModel(path);
     }
 
     // draws the model, and thus all its meshes
-    void Draw(Shader2& shader)
+    void Draw(Shader2& shader, glm::vec3 color, float angle)
     {
+        
+        angle *= speed;
+        position.x += speed;
+        glm::mat4 model = glm::mat4(1.0f);
+        shader.use();
+        model = glm::translate(model, glm::vec3(position.x, position.y, 0.0f)); // where to place the cube
+        if(speed > 0)
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+        shader.setVec3("objectColor", color);
+        // translate it down so it's at the center of the scene
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+        shader.setMat4("model", model);
         for (unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
+    }
+
+    void Stop() {
+        speed = 0;
     }
 
 private:

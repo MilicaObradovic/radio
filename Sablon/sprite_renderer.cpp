@@ -1,6 +1,6 @@
 
 #include "sprite_renderer.h"
-
+#include <iostream>
 
 SpriteRenderer::SpriteRenderer(Shader& shader)
 {
@@ -17,30 +17,25 @@ void SpriteRenderer::DrawSprite(Texture2D& texture, glm::vec2 position, glm::vec
 {
     // prepare transformations
     this->shader.Use();
+
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(position, 0.0f)); 
-
-    if (isAntenna) {
-        model = glm::rotate(model, glm::radians(-155.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // then rotate
-    }
-    else if (isPointer) {
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f)); // then rotate
-
-    }
+    //model = glm::translate(model, glm::vec3(position, 0.0f)); 
+    model = glm::translate(model, glm::vec3(-47.0f, -20.0f, -2.0f));
     
-    model = glm::scale(model, glm::vec3(size, 1.0f));
+    //model = glm::scale(model, glm::vec3(size, 1.0f));
+    model = glm::scale(model, glm::vec3(100.0f, 40.0f, 1.0f));
 
     this->shader.SetMatrix4("model", model);
 
     // render textured quad
-    this->shader.SetVector3f("uColor", color);
+    this->shader.SetVector3f("uColor", glm::vec3(0.3f, 0.3f, 0.3f));
 
     glActiveTexture(GL_TEXTURE0);
-    texture.Bind();
 
     glBindVertexArray(this->quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+
 }
 
 void SpriteRenderer::initRenderData()
@@ -48,14 +43,14 @@ void SpriteRenderer::initRenderData()
     // configure VAO/VBO
     unsigned int VBO;
     float vertices[] = {
-        // pos      // tex
-        0.0f, 0.7f, 0.0f, 1.0f,//donja
-        1.5f, 0.0f, 1.0f, 0.0f,//desna
-        0.0f, 0.0f, 0.0f, 0.0f,//leva
+        // pos
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
 
-        0.0f, 0.7f, 0.0f, 1.0f,//leva
-        1.5f, 0.7f, 1.0f, 1.0f,//desna
-        1.5f, 0.0f, 1.0f, 0.0f,//gornja
+        0.0f, 1.0f, 0.0f,
+        1.0f, 0.0f, 0.0f,
+        1.0f, 1.0f, 0.0f
     };
 
     glGenVertexArrays(1, &this->quadVAO);
@@ -66,7 +61,7 @@ void SpriteRenderer::initRenderData()
 
     glBindVertexArray(this->quadVAO);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }

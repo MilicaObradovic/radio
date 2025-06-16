@@ -13,7 +13,12 @@
 #include <iostream>
 #include <direct.h>  // for _getcwd
 #include <cstdlib>
- 
+#include "game_object.h"
+#include "resource_manager.h"
+#include <ctime>
+#include "text_renderer.h"
+#include <chrono>
+#include <thread>
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
@@ -41,9 +46,12 @@ float lastFrame = 0.0f;
 const unsigned int SCREEN_WIDTH = 950;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
-
+TextRenderer* TextBig;
 int main()
 {
+    
+    srand(static_cast<unsigned int>(time(nullptr)));
+
     if (!glfwInit()) // !0 == 1; glfwInit inicijalizuje GLFW i vrati 1 ako je inicijalizovana uspjesno, a 0 ako nije
     {
         std::cout << "GLFW Biblioteka se nije ucitala! :(\n";
@@ -94,26 +102,38 @@ int main()
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
 
     // build and compile shaders
     // -------------------------
+    TextBig = new TextRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    TextBig->Load("LiberationSans-Regular.ttf", 22);
     Shader2 ourShader("model_loading.vs", "model_loading.frag");
+    ResourceManager::LoadShader("sprite.vs", "sprite.frag", nullptr, "platform");
 
+    Shader shader = ResourceManager::GetShader("platform");
+
+    SpriteRenderer* Renderer = new SpriteRenderer(shader);
     // load models
-  
-    Model ourModel(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
 
+    Model* models[4];
+  
+    models[0]= new  Model(glm::vec3(-45.0f, -10.0f, 0.0f), FileSystem::getPath("cube/CubiCubeRed.obj"));
+    models[1] = new  Model(glm::vec3(-45.0f, -5.0f, 0.0f), FileSystem::getPath("cube/CubiCubeRed.obj"));
+    models[2] = new  Model(glm::vec3(-45.0f, 0.0f, 0.0f), FileSystem::getPath("cube/CubiCubeRed.obj"));
+    models[3] = new  Model(glm::vec3(-45.0f, 5.0f, 0.0f), FileSystem::getPath("cube/CubiCubeRed.obj"));
+    GameObject* Platform = new GameObject(glm::vec2(50.0f, 0.0f), glm::vec2(500.0f, 500.0f), ResourceManager::GetTexture("radio"));
 
     // draw in wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
     // -----------
+    float i = 0;
     while (!glfwWindowShouldClose(window))
     {
-        // per-frame time logic
-        // --------------------
+        float startTime = glfwGetTime();
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -138,42 +158,63 @@ int main()
             projection = glm::perspective(glm::radians(camera.Zoom), aspect, 0.1f, 200.0f);
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
-        else { 
-            float orthoScale = 5.0f;
+        else {
+            float orthoScale = 50.0f;
             projection = glm::ortho(-orthoScale * aspect, orthoScale * aspect,
                 -orthoScale, orthoScale,
                 0.1f, 100.0f);
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             camera.ResetCameraPosition();
-
         }
+        
         glm::mat4 view = camera.GetViewRadiusCamera();
+        glm::vec3 color(1.0f, 0.0f, 0.0f);
 
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
+        ourShader.setVec3("objectColor", 1.0f, 1.0f, 0.0f);
+        float time = glfwGetTime();
 
-        // render the loaded model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model);
-        // After setting projection/view/model matrices:
-        ourShader.setVec3("lightPos", glm::vec3(0.0f, 1.0f, 0.0f));
-        ourShader.setVec3("viewPos", camera.Position);
-        ourShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+        float angle = time * 500.0f;
+        
+        for (int i = 0; i < 4; i++) {
+            if ((*models[i]).position.x >= 51) {
+                for (int i = 0; i < 4; i++) {
+                    (*models[i]).Stop();
+                }
+                break;
+            }
+        }
+        (*models[0]).Draw(ourShader, glm::vec3(1.0f, 0.0f, 0.0f), angle);
+        (*models[1]).Draw(ourShader, glm::vec3(1.0f, 1.0f, 0.0f), angle);
+        (*models[2]).Draw(ourShader, glm::vec3(0.0f, 0.0f, 1.0f), angle);
+        (*models[3]).Draw(ourShader, glm::vec3(0.0f, 1.0f, 0.0f), angle);
+        ResourceManager::GetShader("platform").Use();
+        ResourceManager::GetShader("platform").SetMatrix4("projection", projection);
+        ResourceManager::GetShader("platform").SetMatrix4("view", view);
 
-        ourModel.Draw(ourShader);
+        Platform->Draw(*Renderer, false, false);
 
+        TextBig->RenderText("Milica Obradovic SV40/2021", 5.0f, 5.0f, 1.0f, glm::vec3(0.643, 0.529, 0.475));
+
+       
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
+        float endTime = glfwGetTime();
+        float delta = (startTime - endTime)*1000;
+        if (delta < 1000 / 60) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60 - int(delta)));
+        }
     }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+    delete Platform;
+    delete TextBig;
     return 0;
 }
 

@@ -9,7 +9,6 @@
 
 #include "texture.h"
 #include "sprite_renderer.h"
-#include "circle_renderer.h"
 
 
 class GameObject
